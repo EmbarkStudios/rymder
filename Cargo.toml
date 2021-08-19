@@ -12,3 +12,21 @@ keywords = ["agones", "games", "multiplayer", "k8s"]
 readme = "README.md"
 
 [dependencies]
+async-stream = "0.3"
+http = "0.2"
+prost = "0.8"
+thiserror = "1.0"
+
+[dependencies.tokio]
+version = "1.0"
+default-features = false
+features = ["sync", "time"]
+
+[dependencies.tonic]
+version = "0.5"
+default-features = false
+features = [
+    "codegen",
+    "transport",
+    "prost",
+]
