@@ -45,7 +45,7 @@ fn main() {
         std::path::PathBuf::from(repo_root)
     };
 
-    std::fs::remove_dir_all(&extract_dir);
+    let _ = std::fs::remove_dir_all(&extract_dir);
 
     for ind in protos {
         let mut proto = archive
@@ -80,7 +80,7 @@ fn main() {
     tonic_build::configure()
         // The SDK is just a client, no need to build the server types
         .build_server(false)
-        .out_dir(generated)
+        .out_dir(&generated)
         .compile(
             &[
                 extract_dir.join("sdk/alpha/alpha.proto"),
@@ -93,4 +93,6 @@ fn main() {
             ],
         )
         .expect("failed to compile protobuffers");
+
+    tonic_build::fmt(generated.to_str().unwrap());
 }
