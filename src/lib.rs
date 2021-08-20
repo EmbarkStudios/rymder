@@ -68,4 +68,9 @@
 )]
 // END - Embark standard lints v0.4
 
+pub mod errors;
+#[allow(clippy::all, clippy::doc_markdown)]
 pub mod proto;
+mod sdk;
+
+pub use sdk::Sdk;
