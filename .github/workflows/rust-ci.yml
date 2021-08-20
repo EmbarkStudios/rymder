@@ -43,14 +43,13 @@ jobs:
         with:
           toolchain: stable
           override: true
+      - name: Download agones SDK server
+        run: ./download-sdk-server.sh linux
       - run: cargo fetch
       - name: cargo test build
-        # Note the use of release here means longer compile time, but much
-        # faster test execution time. If you don't have any heavy tests it
-        # might be faster to take off release and just compile in debug
-        run: cargo build --tests --release
+        run: cargo build --tests --all-features
       - name: cargo test
-        run: cargo test --release
+        run: cargo test --all-features
 
   deny-check:
     name: cargo-deny
