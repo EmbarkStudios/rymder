@@ -9,6 +9,10 @@
 
 An unofficial Rust client for [Agones](https://agones.dev/site/).
 
+## Usage
+
+See the [Agones Rust guide](https://agones.dev/site/docs/tutorials/simple-gameserver-rust/) for context about how to use this client, which is _mostly_ the same as the official client in the [Agones repo](https://github.com/googleforgames/agones/tree/main/sdks/rust).
+
 ## Contribution
 
 [![Contributor Covenant](https://img.shields.io/badge/contributor%20covenant-v1.4-ff69b4.svg)](CODE_OF_CONDUCT.md)
