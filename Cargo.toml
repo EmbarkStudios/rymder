@@ -11,11 +11,16 @@ repository = "https://github.com/EmbarkStudios/rymder"
 keywords = ["agones", "games", "multiplayer", "k8s"]
 readme = "README.md"
 
+[features]
+default = []
+# Enables the Player Tracking https://agones.dev/site/docs/guides/player-tracking/
+# alpha feature
+player-tracking = []
+
 [dependencies]
 async-stream = "0.3"
 http = "0.2"
 prost = "0.8"
-thiserror = "1.0"
 
 [dependencies.tokio]
 version = "1.0"
@@ -30,3 +35,6 @@ features = [
     "transport",
     "prost",
 ]
+
+[dev-dependencies]
+tokio = { version = "1.0", default-features = false, features = ["macros", "rt-multi-thread"] }
