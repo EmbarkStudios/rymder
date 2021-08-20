@@ -1,3 +1,5 @@
+//! The code generated from the agones protobuffer files
+
 pub mod api {
     include!("generated/agones.dev.sdk.rs");
 }

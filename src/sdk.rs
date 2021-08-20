@@ -98,8 +98,8 @@ impl Sdk {
         Ok(self.client.shutdown(empty()).await.map(|_| ())?)
     }
 
-    /// Returns a [`tokio::sync::mpsc::Sender`] that will emit a health check
-    /// every time a message is sent on the channel.
+    /// Returns a [`tokio::sync::mpsc::Sender`](https://docs.rs/tokio/1.10.0/tokio/sync/mpsc/struct.Sender.html)
+    /// that will emit a health check every time a message is sent on the channel.
     pub fn health_check(&self) -> tokio::sync::mpsc::Sender<()> {
         let mut health_client = self.clone();
         let (tx, mut rx) = tokio::sync::mpsc::channel(10);
@@ -117,7 +117,8 @@ impl Sdk {
         tx
     }
 
-    /// Set a Label value on the backing Game Server record that is stored in Kubernetes
+    /// Set a [Label](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+    /// value on the backing Game Server record that is stored in Kubernetes
     #[inline]
     pub async fn set_label(
         &mut self,
@@ -134,7 +135,8 @@ impl Sdk {
             .map(|_| ())?)
     }
 
-    /// Set a Annotation value on the backing Game Server record that is stored in Kubernetes
+    /// Set an [Annotation](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+    /// value on the backing Game Server record that is stored in Kubernetes
     #[inline]
     pub async fn set_annotation(
         &mut self,
@@ -163,7 +165,9 @@ impl Sdk {
 
     /// Reserve marks the Game Server as Reserved for a given duration, at which
     /// point it will return the Game Server to a Ready state.
-    /// Note that the smallest reserve duration is 1 second.
+    ///
+    /// Note that the smallest reserve duration is 1 second and is limited to
+    /// second resolution.
     #[inline]
     pub async fn reserve(&mut self, duration: Duration) -> Result<()> {
         Ok(self
