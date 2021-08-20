@@ -210,10 +210,10 @@ impl Sdk {
     }
 
     /// This function increases the SDK’s stored player count by one, and appends
-    /// this playerID to `GameServer.status.players.ids`.
+    /// this player id to `GameServer.status.players.ids`.
     ///
-    /// Returns true and adds the playerID to the list of playerIDs if the
-    /// playerIDs was not already in the list of connected playerIDs.
+    /// Returns true and adds the player id to the list of player ids if it
+    /// was not already present.
     #[inline]
     pub async fn player_connect(&mut self, id: impl Into<String>) -> Result<bool> {
         Ok(self
@@ -226,10 +226,10 @@ impl Sdk {
     }
 
     /// This function decreases the SDK’s stored player count by one, and removes
-    /// the playerID from GameServer.status.players.ids.
+    /// the player id from `GameServer.status.players.ids`.
     ///
-    /// Will return true and remove the supplied playerID from the list of
-    /// connected playerIDs if the playerID value exists within the list.
+    /// Will return true and remove the supplied player id from the list of
+    /// connected player ids if the player id exists within the list.
     #[inline]
     pub async fn player_disconnect(&mut self, id: impl Into<String>) -> Result<bool> {
         Ok(self
@@ -251,7 +251,7 @@ impl Sdk {
             .map(|c| c.into_inner().count)?)
     }
 
-    /// This returns if the playerID is currently connected to the GameServer.
+    /// Returns whether the player id is currently connected to the Game Server.
     /// This is always accurate, even if the value hasn’t been updated to the
     /// Game Server status yet.
     #[inline]
@@ -265,7 +265,7 @@ impl Sdk {
             .map(|b| b.into_inner().bool)?)
     }
 
-    /// This returns the list of the currently connected player ids.
+    /// Returns the list of the currently connected player ids.
     /// This is always accurate, even if the value has not been updated to the
     /// Game Server status yet.
     #[inline]

@@ -261,17 +261,15 @@ async fn player_tracking() {
         );
 
         for ind in 0..20 {
-            assert_eq!(
+            assert!(
                 sdk.player_connect(ind.to_string()).await.unwrap(),
-                true,
                 "unable to add player {}",
                 ind
             );
         }
 
-        assert_eq!(
-            sdk.player_connect("0").await.unwrap(),
-            false,
+        assert!(
+            !sdk.player_connect("0").await.unwrap(),
             "adding player a second time failed"
         );
         assert_eq!(
@@ -281,17 +279,15 @@ async fn player_tracking() {
         assert_eq!(sdk.get_player_count().await.unwrap(), 20);
 
         for ind in (0..20).filter(|i| i % 2 == 0) {
-            assert_eq!(
+            assert!(
                 sdk.player_disconnect(ind.to_string()).await.unwrap(),
-                true,
                 "unable to disconnect player {}",
                 ind
             );
         }
 
-        assert_eq!(
-            sdk.player_disconnect("0").await.unwrap(),
-            false,
+        assert!(
+            !sdk.player_disconnect("0").await.unwrap(),
             "disconnecting a player a second time failed"
         );
 
