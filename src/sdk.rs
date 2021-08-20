@@ -1,9 +1,11 @@
 use std::{env, time::Duration};
 use tonic::transport::Channel;
 
-use crate::proto::api;
+use crate::proto::api::{self, sdk_client::SdkClient};
 
-use api::sdk_client::SdkClient;
+#[cfg(feature = "player-tracking")]
+use crate::proto::alpha::{self, sdk_client::SdkClient as AlphaClient};
+
 pub use api::GameServer;
 
 pub type WatchStream = tonic::Streaming<GameServer>;
@@ -20,7 +22,7 @@ fn empty() -> api::Empty {
 pub struct Sdk {
     client: SdkClient<Channel>,
     #[cfg(feature = "player-tracking")]
-    alpha: crate::proto::alpha::SdkClient<Channel>,
+    alpha: AlphaClient<Channel>,
 }
 
 impl Sdk {
@@ -56,7 +58,7 @@ impl Sdk {
         let mut client = SdkClient::new(channel.clone());
 
         #[cfg(feature = "player-tracking")]
-        let alpha = crate::proto::alpha::SdkClient::new(channel);
+        let alpha = AlphaClient::new(channel);
 
         tokio::time::timeout(timeout.unwrap_or_else(|| Duration::from_secs(30)), async {
             let mut connect_interval = tokio::time::interval(Duration::from_millis(100));
@@ -192,7 +194,7 @@ impl Sdk {
     pub async fn get_player_capacity(&mut self) -> Result<i64> {
         Ok(self
             .alpha
-            .get_player_capacity(api::Empty {})
+            .get_player_capacity(alpha::Empty {})
             .await
             .map(|c| c.into_inner().count)?)
     }
@@ -202,7 +204,7 @@ impl Sdk {
     pub async fn set_player_capacity(&mut self, count: i64) -> Result<()> {
         Ok(self
             .alpha
-            .set_player_capacity(api::Count { count })
+            .set_player_capacity(alpha::Count { count })
             .await
             .map(|_| ())?)
     }
@@ -215,8 +217,8 @@ impl Sdk {
     #[inline]
     pub async fn player_connect(&mut self, id: impl Into<String>) -> Result<bool> {
         Ok(self
-            .client
-            .player_connect(api::PlayerId {
+            .alpha
+            .player_connect(alpha::PlayerId {
                 player_id: id.into(),
             })
             .await
@@ -232,7 +234,7 @@ impl Sdk {
     pub async fn player_disconnect(&mut self, id: impl Into<String>) -> Result<bool> {
         Ok(self
             .alpha
-            .player_disconnect(api::PlayerId {
+            .player_disconnect(alpha::PlayerId {
                 player_id: id.into(),
             })
             .await
@@ -244,7 +246,7 @@ impl Sdk {
     pub async fn get_player_count(&mut self) -> Result<i64> {
         Ok(self
             .alpha
-            .get_player_count(api::Empty {})
+            .get_player_count(alpha::Empty {})
             .await
             .map(|c| c.into_inner().count)?)
     }
@@ -256,7 +258,7 @@ impl Sdk {
     pub async fn is_player_connected(&mut self, id: impl Into<String>) -> Result<bool> {
         Ok(self
             .alpha
-            .is_player_connected(api::PlayerId {
+            .is_player_connected(alpha::PlayerId {
                 player_id: id.into(),
             })
             .await
@@ -270,7 +272,7 @@ impl Sdk {
     pub async fn get_connected_players(&mut self) -> Result<Vec<String>> {
         Ok(self
             .alpha
-            .get_connected_players(api::Empty {})
+            .get_connected_players(alpha::Empty {})
             .await
             .map(|pl| pl.into_inner().list)?)
     }
