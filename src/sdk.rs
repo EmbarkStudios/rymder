@@ -38,7 +38,7 @@ impl Sdk {
     ///
     /// - The port specified in `AGONES_SDK_GRPC_PORT` can't be parsed as a `u16`.
     /// - A connection cannot be established with an Agones SDK server
-    /// - The handshake takes longer than the specified handshake_timeout duration
+    /// - The handshake takes longer than the specified `handshake_timeout` duration
     pub async fn new(
         port: Option<u16>,
         handshake_timeout: Option<Duration>,
