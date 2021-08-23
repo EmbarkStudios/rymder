@@ -7,16 +7,18 @@ pub enum Error {
     InvalidUri(http::uri::InvalidUri),
     Rpc(tonic::Status),
     Transport(tonic::transport::Error),
+    ParseInteger(std::num::ParseIntError),
 }
 
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         Some(match self {
+            Self::HealthPingConnectionFailure(_) => return None,
             Self::TimedOut(elapsed) => elapsed,
             Self::InvalidUri(invalid) => invalid,
             Self::Rpc(status) => status,
             Self::Transport(transport) => transport,
-            Self::HealthPingConnectionFailure(_) => return None,
+            Self::ParseInteger(parse) => parse,
         })
     }
 }
@@ -33,6 +35,7 @@ impl fmt::Display for Error {
             Self::InvalidUri(invalid) => write!(f, "failed to parse connection uri: `{}`", invalid),
             Self::Rpc(status) => write!(f, "rpc failure: `{}`", status),
             Self::Transport(transport) => write!(f, "transport failure: `{}`", transport),
+            Self::ParseInteger(parse) => write!(f, "failed to parse integer: `{}`", parse),
         }
     }
 }

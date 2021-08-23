@@ -74,4 +74,5 @@ pub mod errors;
 pub mod proto;
 mod sdk;
 
+pub use errors::Error;
 pub use sdk::Sdk;

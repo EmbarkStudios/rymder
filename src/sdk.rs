@@ -26,28 +26,35 @@ pub struct Sdk {
 }
 
 impl Sdk {
-    /// Starts a new SDK instance, and connects to localhost on the port specified
+    /// Starts a new SDK instance, and connects to localhost on the `port` specified
     /// or else falls back to the `AGONES_SDK_GRPC_PORT` environment variable,
     /// or defaults to 9357.
+    ///
+    /// The `handshake_timeout` applies to the time it takes to perform the
+    /// initial handshake with the agones sidecar once a connection has been
+    /// established.
     ///
     /// # Errors
     ///
     /// - The port specified in `AGONES_SDK_GRPC_PORT` can't be parsed as a `u16`.
     /// - A connection cannot be established with an Agones SDK server
-    /// - The handshake takes longer than the specified timeout duration
+    /// - The handshake takes longer than the specified handshake_timeout duration
     pub async fn new(
         port: Option<u16>,
-        timeout: Option<Duration>,
+        handshake_timeout: Option<Duration>,
         keep_alive: Option<Duration>,
     ) -> Result<Self> {
         let addr: http::Uri = format!(
             "http://localhost:{}",
-            port.unwrap_or_else(|| {
-                env::var("AGONES_SDK_GRPC_PORT")
-                    .ok()
-                    .and_then(|s| s.parse().ok())
-                    .unwrap_or(9357)
-            })
+            match port {
+                Some(port) => port,
+                None => {
+                    match env::var("AGONES_SDK_GRPC_PORT") {
+                        Ok(val) => val.parse().map_err(crate::Error::ParseInteger)?,
+                        Err(_) => 9357,
+                    }
+                }
+            }
         )
         .parse()?;
 
@@ -60,17 +67,20 @@ impl Sdk {
         #[cfg(feature = "player-tracking")]
         let alpha = AlphaClient::new(channel);
 
-        tokio::time::timeout(timeout.unwrap_or_else(|| Duration::from_secs(30)), async {
-            let mut connect_interval = tokio::time::interval(Duration::from_millis(100));
+        tokio::time::timeout(
+            handshake_timeout.unwrap_or_else(|| Duration::from_secs(30)),
+            async {
+                let mut connect_interval = tokio::time::interval(Duration::from_millis(100));
 
-            loop {
-                connect_interval.tick().await;
+                loop {
+                    connect_interval.tick().await;
 
-                if client.get_game_server(empty()).await.is_ok() {
-                    break;
+                    if client.get_game_server(empty()).await.is_ok() {
+                        break;
+                    }
                 }
-            }
-        })
+            },
+        )
         .await?;
 
         Ok(Self {
