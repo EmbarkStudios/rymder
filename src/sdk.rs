@@ -1,6 +1,6 @@
-mod gameserver;
+pub mod gameserver;
 
-use std::{env, time::Duration};
+use std::{convert::TryInto, env, time::Duration};
 use tonic::transport::Channel;
 
 use crate::proto::api::{self, sdk_client::SdkClient};
@@ -9,8 +9,6 @@ use crate::proto::api::{self, sdk_client::SdkClient};
 use crate::proto::alpha::{self, sdk_client::SdkClient as AlphaClient};
 
 pub use gameserver::GameServer;
-
-pub type WatchStream = tonic::Streaming<GameServer>;
 
 use crate::errors::Result;
 
@@ -184,11 +182,11 @@ impl Sdk {
     /// Returns most of the backing Game Server configuration and Status
     #[inline]
     pub async fn get_gameserver(&mut self) -> Result<GameServer> {
-        Ok(self
-            .client
+        self.client
             .get_game_server(empty())
             .await
-            .map(|res| res.into_inner().into())?)
+            .map_err(crate::Error::from)
+            .and_then(|res| res.into_inner().try_into())
     }
 
     /// Reserve marks the Game Server as Reserved for a given duration, at which
@@ -208,12 +206,17 @@ impl Sdk {
     }
 
     /// Watch the backing Game Server configuration on updated
-    pub async fn watch_gameserver(&mut self) -> Result<WatchStream> {
-        Ok(self
-            .client
-            .watch_game_server(empty())
-            .await
-            .map(|stream| stream.into_inner())?)
+    pub async fn watch_gameserver(
+        &mut self,
+    ) -> Result<impl futures_util::Stream<Item = Result<GameServer>>> {
+        use futures_util::stream::StreamExt;
+
+        Ok(self.client.watch_game_server(empty()).await.map(|stream| {
+            stream.into_inner().map(|res| {
+                res.map_err(crate::Error::from)
+                    .and_then(|ogs| ogs.try_into())
+            })
+        })?)
     }
 }
 

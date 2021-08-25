@@ -8,17 +8,23 @@ pub enum Error {
     Rpc(tonic::Status),
     Transport(tonic::transport::Error),
     ParseInteger(std::num::ParseIntError),
+    UnknownState(String),
+    InvalidIp {
+        ip_str: String,
+        err: std::net::AddrParseError,
+    },
 }
 
 impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         Some(match self {
-            Self::HealthPingConnectionFailure(_) => return None,
+            Self::HealthPingConnectionFailure(_) | Self::UnknownState(_) => return None,
             Self::TimedOut(elapsed) => elapsed,
             Self::InvalidUri(invalid) => invalid,
             Self::Rpc(status) => status,
             Self::Transport(transport) => transport,
             Self::ParseInteger(parse) => parse,
+            Self::InvalidIp { err, .. } => err,
         })
     }
 }
@@ -36,6 +42,10 @@ impl fmt::Display for Error {
             Self::Rpc(status) => write!(f, "rpc failure: `{}`", status),
             Self::Transport(transport) => write!(f, "transport failure: `{}`", transport),
             Self::ParseInteger(parse) => write!(f, "failed to parse integer: `{}`", parse),
+            Self::UnknownState(us) => write!(f, "received an unknown state '{}' from agones", us),
+            Self::InvalidIp { ip_str, err } => {
+                write!(f, "failed to parse ip '{}': {}", ip_str, err)
+            }
         }
     }
 }
