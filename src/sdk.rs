@@ -32,20 +32,19 @@ impl Sdk {
     /// or else falls back to the `AGONES_SDK_GRPC_PORT` environment variable,
     /// or defaults to 9357.
     ///
-    /// The `handshake_timeout` applies to the time it takes to perform the
-    /// initial handshake with the agones sidecar once a connection has been
-    /// established.
+    /// The `connect_timeout` applies to the time it takes to perform the initial
+    /// connection as well as the handshake with the agones sidecar.
     ///
     /// # Errors
     ///
     /// - The port specified in `AGONES_SDK_GRPC_PORT` can't be parsed as a `u16`.
     /// - A connection cannot be established with an Agones SDK server
     /// - The handshake takes longer than the specified `handshake_timeout` duration
-    pub async fn new(
+    pub async fn connect(
         port: Option<u16>,
-        handshake_timeout: Option<Duration>,
+        connect_timeout: Option<Duration>,
         keep_alive: Option<Duration>,
-    ) -> Result<Self> {
+    ) -> Result<(Self, GameServer)> {
         let addr: http::Uri = format!(
             "http://localhost:{}",
             match port {
@@ -63,33 +62,50 @@ impl Sdk {
         let builder = tonic::transport::channel::Channel::builder(addr)
             .keep_alive_timeout(keep_alive.unwrap_or_else(|| Duration::from_secs(30)));
 
-        let channel = builder.connect().await?;
-        let mut client = SdkClient::new(channel.clone());
-
-        #[cfg(feature = "player-tracking")]
-        let alpha = AlphaClient::new(channel);
-
-        tokio::time::timeout(
-            handshake_timeout.unwrap_or_else(|| Duration::from_secs(30)),
+        let (client, game_server, _channel) = tokio::time::timeout(
+            connect_timeout.unwrap_or_else(|| Duration::from_secs(30)),
             async {
                 let mut connect_interval = tokio::time::interval(Duration::from_millis(100));
 
-                loop {
+                let channel = loop {
                     connect_interval.tick().await;
 
-                    if client.get_game_server(empty()).await.is_ok() {
-                        break;
+                    // It would be nice to differentiate between transient errors
+                    // (eg, agones sidecar is still initializing) and hard errors
+                    // but tonic's error doesn't really allow good introspection
+                    // so we just retry until we succeed or timeout
+                    if let Ok(channel) = builder.connect().await {
+                        break channel;
                     }
-                }
+                };
+
+                let mut client = SdkClient::new(channel.clone());
+
+                let game_server: GameServer = loop {
+                    if let Ok(game_server) = client.get_game_server(empty()).await {
+                        break game_server.into_inner().try_into()?;
+                    }
+
+                    connect_interval.tick().await;
+                };
+
+                Ok((client, game_server, channel))
             },
         )
-        .await?;
+        .await?
+        .map_err(|e: crate::Error| e)?;
 
-        Ok(Self {
-            client,
-            #[cfg(feature = "player-tracking")]
-            alpha,
-        })
+        #[cfg(feature = "player-tracking")]
+        let alpha = AlphaClient::new(_channel);
+
+        Ok((
+            Self {
+                client,
+                #[cfg(feature = "player-tracking")]
+                alpha,
+            },
+            game_server,
+        ))
     }
 
     /// Marks the Game Server as ready to receive connections

@@ -57,16 +57,10 @@ impl SdkServer {
 }
 
 async fn connect(port: u16) -> rymder::Sdk {
-    tokio::time::timeout(Duration::from_secs(2), async {
-        loop {
-            if let Ok(sdk) = rymder::Sdk::new(Some(port), Some(Duration::from_secs(2)), None).await
-            {
-                return sdk;
-            }
-        }
-    })
-    .await
-    .expect("failed to connect to sdk server")
+    rymder::Sdk::connect(Some(port), Some(Duration::from_secs(2)), None)
+        .await
+        .expect("failed to connect to sdk server in 2s")
+        .0
 }
 
 #[tokio::test]
