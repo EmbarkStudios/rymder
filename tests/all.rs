@@ -224,8 +224,7 @@ async fn player_tracking() {
                             gs = stream.message() => {
                                 match gs {
                                     Ok(Some(gs)) => {
-                                        println!("GameServer Update, name: {}", gs.object_meta.unwrap().name);
-                                        println!("GameServer Update, state: {}", gs.status.unwrap().state);
+                                        println!("GameServer update: {:#?}", gs);
                                     }
                                     Ok(None) => {
                                         println!("Server closed the GameServer watch stream");

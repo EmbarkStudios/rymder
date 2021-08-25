@@ -1,3 +1,5 @@
+mod gameserver;
+
 use std::{env, time::Duration};
 use tonic::transport::Channel;
 
@@ -6,7 +8,7 @@ use crate::proto::api::{self, sdk_client::SdkClient};
 #[cfg(feature = "player-tracking")]
 use crate::proto::alpha::{self, sdk_client::SdkClient as AlphaClient};
 
-pub use api::GameServer;
+pub use gameserver::GameServer;
 
 pub type WatchStream = tonic::Streaming<GameServer>;
 
@@ -170,7 +172,7 @@ impl Sdk {
             .client
             .get_game_server(empty())
             .await
-            .map(|res| res.into_inner())?)
+            .map(|res| res.into_inner().into())?)
     }
 
     /// Reserve marks the Game Server as Reserved for a given duration, at which
