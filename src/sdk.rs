@@ -226,20 +226,22 @@ impl Sdk {
     /// If the player capacity is set from outside the SDK, use
     /// [`Sdk::get_gameserver`] instead.
     #[inline]
-    pub async fn get_player_capacity(&mut self) -> Result<i64> {
+    pub async fn get_player_capacity(&mut self) -> Result<u64> {
         Ok(self
             .alpha
             .get_player_capacity(alpha::Empty {})
             .await
-            .map(|c| c.into_inner().count)?)
+            .map(|c| c.into_inner().count as u64)?)
     }
 
     /// This changes the player capacity to a new value.
     #[inline]
-    pub async fn set_player_capacity(&mut self, count: i64) -> Result<()> {
+    pub async fn set_player_capacity(&mut self, count: u64) -> Result<()> {
         Ok(self
             .alpha
-            .set_player_capacity(alpha::Count { count })
+            .set_player_capacity(alpha::Count {
+                count: count as i64,
+            })
             .await
             .map(|_| ())?)
     }
@@ -278,12 +280,12 @@ impl Sdk {
 
     /// Returns the current player count.
     #[inline]
-    pub async fn get_player_count(&mut self) -> Result<i64> {
+    pub async fn get_player_count(&mut self) -> Result<u64> {
         Ok(self
             .alpha
             .get_player_count(alpha::Empty {})
             .await
-            .map(|c| c.into_inner().count)?)
+            .map(|c| c.into_inner().count as u64)?)
     }
 
     /// Returns whether the player id is currently connected to the Game Server.
