@@ -63,7 +63,7 @@ impl Sdk {
         let (client, game_server, _channel) = tokio::time::timeout(
             connect_timeout.unwrap_or_else(|| Duration::from_secs(30)),
             async {
-                let mut connect_interval = tokio::time::interval(Duration::from_millis(100));
+                let mut connect_interval = tokio::time::interval(Duration::from_millis(1));
 
                 let channel = loop {
                     connect_interval.tick().await;
