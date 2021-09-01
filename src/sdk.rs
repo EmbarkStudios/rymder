@@ -1,4 +1,6 @@
-use std::{env, time::Duration};
+pub mod gameserver;
+
+use std::{convert::TryInto, env, time::Duration};
 use tonic::transport::Channel;
 
 use crate::proto::api::{self, sdk_client::SdkClient};
@@ -6,9 +8,7 @@ use crate::proto::api::{self, sdk_client::SdkClient};
 #[cfg(feature = "player-tracking")]
 use crate::proto::alpha::{self, sdk_client::SdkClient as AlphaClient};
 
-pub use api::GameServer;
-
-pub type WatchStream = tonic::Streaming<GameServer>;
+pub use gameserver::GameServer;
 
 use crate::errors::Result;
 
@@ -30,20 +30,19 @@ impl Sdk {
     /// or else falls back to the `AGONES_SDK_GRPC_PORT` environment variable,
     /// or defaults to 9357.
     ///
-    /// The `handshake_timeout` applies to the time it takes to perform the
-    /// initial handshake with the agones sidecar once a connection has been
-    /// established.
+    /// The `connect_timeout` applies to the time it takes to perform the initial
+    /// connection as well as the handshake with the agones sidecar.
     ///
     /// # Errors
     ///
     /// - The port specified in `AGONES_SDK_GRPC_PORT` can't be parsed as a `u16`.
     /// - A connection cannot be established with an Agones SDK server
     /// - The handshake takes longer than the specified `handshake_timeout` duration
-    pub async fn new(
+    pub async fn connect(
         port: Option<u16>,
-        handshake_timeout: Option<Duration>,
+        connect_timeout: Option<Duration>,
         keep_alive: Option<Duration>,
-    ) -> Result<Self> {
+    ) -> Result<(Self, GameServer)> {
         let addr: http::Uri = format!(
             "http://localhost:{}",
             match port {
@@ -61,33 +60,50 @@ impl Sdk {
         let builder = tonic::transport::channel::Channel::builder(addr)
             .keep_alive_timeout(keep_alive.unwrap_or_else(|| Duration::from_secs(30)));
 
-        let channel = builder.connect().await?;
-        let mut client = SdkClient::new(channel.clone());
-
-        #[cfg(feature = "player-tracking")]
-        let alpha = AlphaClient::new(channel);
-
-        tokio::time::timeout(
-            handshake_timeout.unwrap_or_else(|| Duration::from_secs(30)),
+        let (client, game_server, _channel) = tokio::time::timeout(
+            connect_timeout.unwrap_or_else(|| Duration::from_secs(30)),
             async {
-                let mut connect_interval = tokio::time::interval(Duration::from_millis(100));
+                let mut connect_interval = tokio::time::interval(Duration::from_millis(1));
 
-                loop {
+                let channel = loop {
                     connect_interval.tick().await;
 
-                    if client.get_game_server(empty()).await.is_ok() {
-                        break;
+                    // It would be nice to differentiate between transient errors
+                    // (eg, agones sidecar is still initializing) and hard errors
+                    // but tonic's error doesn't really allow good introspection
+                    // so we just retry until we succeed or timeout
+                    if let Ok(channel) = builder.connect().await {
+                        break channel;
                     }
-                }
+                };
+
+                let mut client = SdkClient::new(channel.clone());
+
+                let game_server: GameServer = loop {
+                    if let Ok(game_server) = client.get_game_server(empty()).await {
+                        break game_server.into_inner().try_into()?;
+                    }
+
+                    connect_interval.tick().await;
+                };
+
+                Ok((client, game_server, channel))
             },
         )
-        .await?;
+        .await?
+        .map_err(|e: crate::Error| e)?;
 
-        Ok(Self {
-            client,
-            #[cfg(feature = "player-tracking")]
-            alpha,
-        })
+        #[cfg(feature = "player-tracking")]
+        let alpha = AlphaClient::new(_channel);
+
+        Ok((
+            Self {
+                client,
+                #[cfg(feature = "player-tracking")]
+                alpha,
+            },
+            game_server,
+        ))
     }
 
     /// Marks the Game Server as ready to receive connections
@@ -166,11 +182,11 @@ impl Sdk {
     /// Returns most of the backing Game Server configuration and Status
     #[inline]
     pub async fn get_gameserver(&mut self) -> Result<GameServer> {
-        Ok(self
-            .client
+        self.client
             .get_game_server(empty())
             .await
-            .map(|res| res.into_inner())?)
+            .map_err(crate::Error::from)
+            .and_then(|res| res.into_inner().try_into())
     }
 
     /// Reserve marks the Game Server as Reserved for a given duration, at which
@@ -190,12 +206,17 @@ impl Sdk {
     }
 
     /// Watch the backing Game Server configuration on updated
-    pub async fn watch_gameserver(&mut self) -> Result<WatchStream> {
-        Ok(self
-            .client
-            .watch_game_server(empty())
-            .await
-            .map(|stream| stream.into_inner())?)
+    pub async fn watch_gameserver(
+        &mut self,
+    ) -> Result<impl futures_util::Stream<Item = Result<GameServer>>> {
+        use futures_util::stream::StreamExt;
+
+        Ok(self.client.watch_game_server(empty()).await.map(|stream| {
+            stream.into_inner().map(|res| {
+                res.map_err(crate::Error::from)
+                    .and_then(|ogs| ogs.try_into())
+            })
+        })?)
     }
 }
 
@@ -205,20 +226,22 @@ impl Sdk {
     /// If the player capacity is set from outside the SDK, use
     /// [`Sdk::get_gameserver`] instead.
     #[inline]
-    pub async fn get_player_capacity(&mut self) -> Result<i64> {
+    pub async fn get_player_capacity(&mut self) -> Result<u64> {
         Ok(self
             .alpha
             .get_player_capacity(alpha::Empty {})
             .await
-            .map(|c| c.into_inner().count)?)
+            .map(|c| c.into_inner().count as u64)?)
     }
 
     /// This changes the player capacity to a new value.
     #[inline]
-    pub async fn set_player_capacity(&mut self, count: i64) -> Result<()> {
+    pub async fn set_player_capacity(&mut self, count: u64) -> Result<()> {
         Ok(self
             .alpha
-            .set_player_capacity(alpha::Count { count })
+            .set_player_capacity(alpha::Count {
+                count: count as i64,
+            })
             .await
             .map(|_| ())?)
     }
@@ -257,12 +280,12 @@ impl Sdk {
 
     /// Returns the current player count.
     #[inline]
-    pub async fn get_player_count(&mut self) -> Result<i64> {
+    pub async fn get_player_count(&mut self) -> Result<u64> {
         Ok(self
             .alpha
             .get_player_count(alpha::Empty {})
             .await
-            .map(|c| c.into_inner().count)?)
+            .map(|c| c.into_inner().count as u64)?)
     }
 
     /// Returns whether the player id is currently connected to the Game Server.

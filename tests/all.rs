@@ -1,3 +1,4 @@
+use rymder::futures_util::StreamExt;
 use std::{process as proc, time::Duration};
 
 const DEFAULT_PORT: u16 = 9357;
@@ -57,16 +58,12 @@ impl SdkServer {
 }
 
 async fn connect(port: u16) -> rymder::Sdk {
-    tokio::time::timeout(Duration::from_secs(2), async {
-        loop {
-            if let Ok(sdk) = rymder::Sdk::new(Some(port), Some(Duration::from_secs(2)), None).await
-            {
-                return sdk;
-            }
-        }
-    })
-    .await
-    .expect("failed to connect to sdk server")
+    let (sdk, gs) = rymder::Sdk::connect(Some(port), Some(Duration::from_secs(2)), None)
+        .await
+        .expect("failed to connect to sdk server in 2s");
+
+    println!("Initial gameserver: {:#?}", gs);
+    sdk
 }
 
 #[tokio::test]
@@ -119,18 +116,17 @@ async fn sdk() {
                     Err(e) => println!("Failed to watch for GameServer updates: {}", e),
                     Ok(mut stream) => loop {
                         tokio::select! {
-                            gs = stream.message() => {
+                            gs = stream.next() => {
                                 match gs {
-                                    Ok(Some(gs)) => {
-                                        println!("GameServer Update, name: {}", gs.object_meta.unwrap().name);
-                                        println!("GameServer Update, state: {}", gs.status.unwrap().state);
+                                    Some(Ok(gs)) => {
+                                        println!("GameServer update: {:#?}", gs);
                                     }
-                                    Ok(None) => {
+                                    Some(Err(e)) => {
+                                        panic!("GameServer Update stream encountered an error: {}", e);
+                                    }
+                                    None => {
                                         println!("Server closed the GameServer watch stream");
                                         break;
-                                    }
-                                    Err(e) => {
-                                        panic!("GameServer Update stream encountered an error: {}", e);
                                     }
                                 }
 
@@ -221,18 +217,17 @@ async fn player_tracking() {
                     Err(e) => println!("Failed to watch for GameServer updates: {}", e),
                     Ok(mut stream) => loop {
                         tokio::select! {
-                            gs = stream.message() => {
+                            gs = stream.next() => {
                                 match gs {
-                                    Ok(Some(gs)) => {
-                                        println!("GameServer Update, name: {}", gs.object_meta.unwrap().name);
-                                        println!("GameServer Update, state: {}", gs.status.unwrap().state);
+                                    Some(Ok(gs)) => {
+                                        println!("GameServer update: {:#?}", gs);
                                     }
-                                    Ok(None) => {
+                                    Some(Err(e)) => {
+                                        panic!("GameServer Update stream encountered an error: {}", e);
+                                    }
+                                    None => {
                                         println!("Server closed the GameServer watch stream");
                                         break;
-                                    }
-                                    Err(e) => {
-                                        panic!("GameServer Update stream encountered an error: {}", e);
                                     }
                                 }
 
