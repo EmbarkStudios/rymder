@@ -1,7 +1,10 @@
+//! Wrappers around various types generated from protobuf definitions to make
+//! them more ergonomic
+
 use chrono::TimeZone;
 
-use crate::proto::api::{self, game_server};
-use crate::Error;
+use crate::{proto::api, Error};
+use std::time::Duration;
 
 /// Different exclusive states a `GameServer` can be in. See the
 /// [docs](https://agones.dev/site/docs/guides/client-sdks/#function-reference)
@@ -37,34 +40,59 @@ impl std::str::FromStr for State {
     }
 }
 
+/// A port exposed by the container
 #[derive(Debug)]
 pub struct Port {
+    /// The name of the port
     pub name: String,
+    /// The actual port number
     pub port: u16,
 }
 
-/// A more strongly-typed wrapper around [`Status`](crate::proto::api::game_server::Status)
+/// A more strongly-typed wrapper around
+/// [`Status`](crate::proto::api::game_server::Status)
 #[derive(Debug)]
 pub struct Status {
+    /// The current state of the `GameServer`, see [Lifecycle Management](
+    /// https://agones.dev/site/docs/guides/client-sdks/#lifecycle-management)
+    /// for more details
     pub state: State,
+    /// The pubic IP address the `GameServer` is being served from
     pub address: std::net::IpAddr,
+    /// The ports exposed by the `GameServer` container
     pub ports: Vec<Port>,
+    /// The current number, capacity, and list of connected player identifiers
     #[cfg(feature = "player-tracking")]
-    pub players: Option<game_server::status::PlayerStatus>,
+    pub players: Option<api::game_server::status::PlayerStatus>,
 }
 
-/// Representation of the k8s [`ObjectMeta`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#objectmeta-v1-meta)
+/// Representation of the k8s
+/// [`ObjectMeta`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#objectmeta-v1-meta)
 /// resource
 #[derive(Debug)]
 pub struct ObjectMeta {
+    /// The name of the pod in k8s
     pub name: String,
+    /// The namespace in k8s the pod is running in
     pub namespace: String,
+    /// The [uuid](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids)
+    /// assigned to the pod
     pub uid: String,
+    /// The k8s [resource version](https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions)
+    /// for the pod
     pub resource_version: String,
+    /// The [generation](https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#status-subresource)
+    /// of the deployed pod
     pub generation: i64,
+    /// The time the pod was [created](https://kubernetes.io/docs/reference/using-api/api-concepts/#generated-values)
     pub creation_timestamp: chrono::DateTime<chrono::Utc>,
+    /// The time the pod was [deleted](https://kubernetes.io/docs/reference/using-api/api-concepts/#generated-values)
     pub deletion_timestamp: Option<chrono::DateTime<chrono::Utc>>,
+    /// The [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
+    /// currently applied to the pod
     pub annotations: std::collections::HashMap<String, String>,
+    /// The [labels](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+    /// currently applied to the pod
     pub labels: std::collections::HashMap<String, String>,
 }
 
@@ -81,10 +109,21 @@ pub struct HealthSpec {
     /// Time after the gameserver has started before the health check is started
     pub initial_delay: Duration,
 }
+
+/// A strongly typed wrapper around the generated
+/// [`GameServer`](crate::proto::api::GameServer).
 #[derive(Debug)]
 pub struct GameServer {
+    /// k8s object metadata
     pub object_meta: Option<ObjectMeta>,
+    /// Currently, health is the
+    /// [only item](crate::proto::api::game_server::Spec::health) exposed from
+    /// the [Spec](crate::proto::api::GameServer::spec), so it is just made into
+    /// a top level field here. This is `None` if the either `spec` or
+    /// `spec.health` is `None` in the original `GameServer`, or if
+    /// `spec.health.disabled == true`.
     pub health_spec: Option<HealthSpec>,
+    /// State information
     pub status: Option<Status>,
 }
 
