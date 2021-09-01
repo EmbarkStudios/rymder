@@ -68,11 +68,23 @@ pub struct ObjectMeta {
     pub labels: std::collections::HashMap<String, String>,
 }
 
-/// A strongly typed wrapper around the generated [`GameServer`](crate::proto::api::GameServer).
+/// More strongly-typed wrapper around
+/// [`Health`](crate::proto::api::game_server::spec::Health)
+#[derive(Debug)]
+pub struct HealthSpec {
+    /// Interval at which health checks must be sent for the gameserver to be
+    /// considered healthy
+    pub period: Duration,
+    /// Minimum number of consecutive failures for the health probe to be
+    /// considered failed
+    pub failure_threshold: std::num::NonZeroU32,
+    /// Time after the gameserver has started before the health check is started
+    pub initial_delay: Duration,
+}
 #[derive(Debug)]
 pub struct GameServer {
     pub object_meta: Option<ObjectMeta>,
-    pub spec: Option<game_server::Spec>,
+    pub health_spec: Option<HealthSpec>,
     pub status: Option<Status>,
 }
 
@@ -131,9 +143,25 @@ impl std::convert::TryFrom<api::GameServer> for GameServer {
             }
         });
 
+        let health_spec = ogs.spec.and_then(|spec| {
+            spec.health.and_then(|health| {
+                if health.disabled {
+                    None
+                } else {
+                    std::num::NonZeroU32::new(health.failure_threshold as u32).map(
+                        |failure_threshold| HealthSpec {
+                            period: Duration::from_secs(health.period_seconds as u64),
+                            failure_threshold,
+                            initial_delay: Duration::from_secs(health.initial_delay_seconds as u64),
+                        },
+                    )
+                }
+            })
+        });
+
         Ok(Self {
             object_meta,
-            spec: ogs.spec,
+            health_spec,
             status,
         })
     }
