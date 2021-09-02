@@ -11,6 +11,9 @@ use std::time::Duration;
 /// for more information
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum State {
+    /// The initial state of a newly created `GameServer` pod. Note this state
+    /// is not sent by the SDK server when used locally.
+    Scheduled,
     /// [Ready](https://agones.dev/site/docs/guides/client-sdks/#ready) to take
     /// player connections
     Ready,
@@ -21,6 +24,9 @@ pub enum State {
     /// means the `GameServer` has active players and should not be deleted or
     /// scaled down
     Allocated,
+    /// Failed to send health checks in a timely manner according to the health
+    /// spec assigned to the `GameServer`
+    Unhealthy,
     /// [Shutdown](https://agones.dev/site/docs/guides/client-sdks/#shutdown)
     /// marks the `GameServer` as reapable
     Shutdown,
@@ -31,9 +37,11 @@ impl std::str::FromStr for State {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
+            "Scheduled" => Self::Scheduled,
             "Ready" => Self::Ready,
             "Reserved" => Self::Reserved,
             "Allocated" => Self::Allocated,
+            "Unhealthy" => Self::Unhealthy,
             "Shutdown" => Self::Shutdown,
             unknown_state => return Err(Error::UnknownState(unknown_state.to_owned())),
         })
