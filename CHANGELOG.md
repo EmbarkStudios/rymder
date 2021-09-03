@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+## [0.2.2] - 2021-09-03
 
 ### Fixed
 - [PR#4](https://github.com/EmbarkStudios/rymder/pull/4) added the missing `PortAllocation`, `Creating`, `Starting`, `RequestReady`, and `Error` states.
@@ -26,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First pass implementation for [Agones 1.16.0](https://agones.dev/site/blog/2021/07/20/1.16.0-kubernetes-1.19-golang-1.15/).
 
 <!-- next-url -->
-[Unreleased]: https://github.com/EmbarkStudios/rymder/compare/0.2.1...HEAD
+[Unreleased]: https://github.com/EmbarkStudios/rymder/compare/0.2.2...HEAD
+[0.2.2]: https://github.com/EmbarkStudios/rymder/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/EmbarkStudios/rymder/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/EmbarkStudios/rymder/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/EmbarkStudios/rymder/releases/tag/0.1.0
