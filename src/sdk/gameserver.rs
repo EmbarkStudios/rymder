@@ -8,12 +8,26 @@ use std::time::Duration;
 
 /// Different exclusive states a `GameServer` can be in. See the
 /// [docs](https://agones.dev/site/docs/guides/client-sdks/#function-reference)
-/// for more information
+/// for more information.
+///
+/// The list of possible states comes from [here](https://github.com/googleforgames/agones/blob/57005f77f6fdb619d856acf4e434810c2ab59c1b/pkg/apis/agones/v1/gameserver.go#L35-L62)
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum State {
+    /// When the `GameServer` is being allocated dynamically, and an open port
+    /// needs to be allocated. It is unlikely/impossible for this state to be
+    /// observed from the gameserver itself.
+    PortAllocation,
+    /// Before the k8s pod is created. Again, unlikely/impossible for this state
+    /// to be observed from the gameserver itself.
+    Creating,
+    /// The k8s pod for the `GameServer` is being created. Again, unlikely/impossible
+    /// for this state to be observed from the gameserver itself.
+    Starting,
     /// The initial state of a newly created `GameServer` pod. Note this state
     /// is not sent by the SDK server when used locally.
     Scheduled,
+    /// The `GameServer` has declared itself ready
+    RequestReady,
     /// [Ready](https://agones.dev/site/docs/guides/client-sdks/#ready) to take
     /// player connections
     Ready,
@@ -30,6 +44,8 @@ pub enum State {
     /// [Shutdown](https://agones.dev/site/docs/guides/client-sdks/#shutdown)
     /// marks the `GameServer` as reapable
     Shutdown,
+    /// Something has gone wrong that cannot be resolved
+    Error,
 }
 
 impl std::str::FromStr for State {
@@ -37,12 +53,17 @@ impl std::str::FromStr for State {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(match s {
+            "PortAllocation" => Self::PortAllocation,
+            "Creating" => Self::Creating,
+            "Starting" => Self::Starting,
             "Scheduled" => Self::Scheduled,
+            "RequestReady" => Self::RequestReady,
             "Ready" => Self::Ready,
             "Reserved" => Self::Reserved,
             "Allocated" => Self::Allocated,
             "Unhealthy" => Self::Unhealthy,
             "Shutdown" => Self::Shutdown,
+            "Error" => Self::Error,
             unknown_state => return Err(Error::UnknownState(unknown_state.to_owned())),
         })
     }
@@ -211,5 +232,31 @@ impl std::convert::TryFrom<api::GameServer> for GameServer {
             health_spec,
             status,
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::State;
+
+    #[test]
+    fn string_states() {
+        assert_eq!(
+            "PortAllocation".parse::<State>().unwrap(),
+            State::PortAllocation
+        );
+        assert_eq!("Creating".parse::<State>().unwrap(), State::Creating);
+        assert_eq!("Starting".parse::<State>().unwrap(), State::Starting);
+        assert_eq!("Scheduled".parse::<State>().unwrap(), State::Scheduled);
+        assert_eq!(
+            "RequestReady".parse::<State>().unwrap(),
+            State::RequestReady
+        );
+        assert_eq!("Ready".parse::<State>().unwrap(), State::Ready);
+        assert_eq!("Shutdown".parse::<State>().unwrap(), State::Shutdown);
+        assert_eq!("Error".parse::<State>().unwrap(), State::Error);
+        assert_eq!("Unhealthy".parse::<State>().unwrap(), State::Unhealthy);
+        assert_eq!("Reserved".parse::<State>().unwrap(), State::Reserved);
+        assert_eq!("Allocated".parse::<State>().unwrap(), State::Allocated);
     }
 }
