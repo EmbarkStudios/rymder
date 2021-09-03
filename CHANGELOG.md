@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+
+### Fixed
+- [PR#4](https://github.com/EmbarkStudios/rymder/pull/4) added the missing `PortAllocation`, `Creating`, `Starting`, `RequestReady`, and `Error` states.
+
 ## [0.2.1] - 2021-09-02
 ### Fixed
 - [PR#3](https://github.com/EmbarkStudios/rymder/pull/3) added the missing `Scheduled` and `Unhealthy` states.
