@@ -3,7 +3,7 @@ fn main() {
         .nth(1)
         .expect("version argument not specified");
 
-    let version = version.strip_prefix("v").unwrap_or(&version);
+    let version = version.strip_prefix('v').unwrap_or(&version);
 
     let zip = reqwest::blocking::get(format!(
         "https://github.com/googleforgames/agones/archive/refs/tags/v{}.zip",
