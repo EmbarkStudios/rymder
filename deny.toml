@@ -9,6 +9,8 @@ unmaintained = "deny"
 notice = "deny"
 unsound = "deny"
 ignore = [
+    "RUSTSEC-2020-0159",
+    "RUSTSEC-2020-0071",
 ]
 
 [bans]
