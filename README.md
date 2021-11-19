@@ -1,4 +1,14 @@
-# 🌌 rymder
+<!-- Allow this file to not have a first line heading -->
+<!-- markdownlint-disable-file MD041 -->
+
+<!-- inline html -->
+<!-- markdownlint-disable-file MD033 -->
+
+<div align="center">
+
+# 🌌 `rymder`
+
+**Unofficial Rust client for [Agones](https://agones.dev/site/)**
 
 [![Embark](https://img.shields.io/badge/embark-open%20source-blueviolet.svg)](https://embark.dev)
 [![Embark](https://img.shields.io/badge/discord-ark-%237289da.svg?logo=discord)](https://discord.gg/dAuKfZS)
@@ -6,8 +16,7 @@
 [![Docs](https://docs.rs/rymder/badge.svg)](https://docs.rs/rymder)
 [![dependency status](https://deps.rs/repo/github/EmbarkStudios/rymder/status.svg)](https://deps.rs/repo/github/EmbarkStudios/rymder)
 [![Build status](https://github.com/EmbarkStudios/rymder/workflows/CI/badge.svg)](https://github.com/EmbarkStudios/rymder/actions)
-
-An unofficial Rust client for [Agones](https://agones.dev/site/).
+</div>
 
 ## Usage
 
