@@ -86,8 +86,8 @@ pub mod game_server {
         pub address: ::prost::alloc::string::String,
         #[prost(message, repeated, tag = "3")]
         pub ports: ::prost::alloc::vec::Vec<status::Port>,
-        /// [Stage:Alpha]
-        /// [FeatureFlag:PlayerTracking]
+        /// \[Stage:Alpha\]
+        /// \[FeatureFlag:PlayerTracking\]
         #[prost(message, optional, tag = "4")]
         pub players: ::core::option::Option<status::PlayerStatus>,
     }
@@ -100,8 +100,8 @@ pub mod game_server {
             #[prost(int32, tag = "2")]
             pub port: i32,
         }
-        /// [Stage:Alpha]
-        /// [FeatureFlag:PlayerTracking]
+        /// \[Stage:Alpha\]
+        /// \[FeatureFlag:PlayerTracking\]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct PlayerStatus {
             #[prost(int64, tag = "1")]
@@ -136,7 +136,7 @@ pub mod sdk_client {
     impl<T> SdkClient<T>
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
-        T::ResponseBody: Body + Send + Sync + 'static,
+        T::ResponseBody: Body + Send + 'static,
         T::Error: Into<StdError>,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
