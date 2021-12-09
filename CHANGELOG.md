@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+### Changed
+- [PR#8](https://github.com/EmbarkStudios/rymder/pull/8) Updates tonic and prost to the latest versions.
+- [PR#8](https://github.com/EmbarkStudios/rymder/pull/8) Bindings are now generated for agones 1.19.
+
 ## [0.2.2] - 2021-09-03
 
 ### Fixed
