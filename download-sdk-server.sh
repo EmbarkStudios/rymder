@@ -8,7 +8,7 @@ if [ -z "$1" ]
 fi
 
 which=$1
-agones_version="1.18.0"
+agones_version="1.19.0"
 
 # unzip doesn't support stdin streams so we need to use a temp file
 server_zip=$(mktemp)
