@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+### Changed
+- [PR#5](https://github.com/EmbarkStudios/rymder/pull/14) replaced `chrono` with `time` due to `chrono` being unmaintained.
 
 ## [0.3.0] - 2022-01-11
 
