@@ -1,10 +1,10 @@
 //! Wrappers around various types generated from protobuf definitions to make
 //! them more ergonomic
 
-use chrono::TimeZone;
-
 use crate::{proto::api, Error};
 use std::time::Duration;
+
+pub type Timestamp = time::OffsetDateTime;
 
 /// Different exclusive states a `GameServer` can be in. See the
 /// [docs](https://agones.dev/site/docs/guides/client-sdks/#function-reference)
@@ -114,9 +114,9 @@ pub struct ObjectMeta {
     /// of the deployed pod
     pub generation: i64,
     /// The time the pod was [created](https://kubernetes.io/docs/reference/using-api/api-concepts/#generated-values)
-    pub creation_timestamp: chrono::DateTime<chrono::Utc>,
+    pub creation_timestamp: Timestamp,
     /// The time the pod was [deleted](https://kubernetes.io/docs/reference/using-api/api-concepts/#generated-values)
-    pub deletion_timestamp: Option<chrono::DateTime<chrono::Utc>>,
+    pub deletion_timestamp: Option<Timestamp>,
     /// The [annotations](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
     /// currently applied to the pod
     pub annotations: std::collections::HashMap<String, String>,
@@ -195,21 +195,25 @@ impl std::convert::TryFrom<api::GameServer> for GameServer {
             None => None,
         };
 
-        let object_meta = ogs.object_meta.map(|om| {
-            let dt = om.deletion_timestamp;
-
-            ObjectMeta {
+        let object_meta = if let Some(om) = ogs.object_meta {
+            Some(ObjectMeta {
                 name: om.name,
                 namespace: om.namespace,
                 uid: om.uid,
                 resource_version: om.resource_version,
                 generation: om.generation,
-                creation_timestamp: chrono::Utc.timestamp(om.creation_timestamp, 0),
-                deletion_timestamp: (dt != 0).then(|| chrono::Utc.timestamp(dt, 0)),
+                creation_timestamp: Timestamp::from_unix_timestamp(om.creation_timestamp)?,
+                deletion_timestamp: if om.deletion_timestamp != 0 {
+                    Some(Timestamp::from_unix_timestamp(om.deletion_timestamp)?)
+                } else {
+                    None
+                },
                 annotations: om.annotations,
                 labels: om.labels,
-            }
-        });
+            })
+        } else {
+            None
+        };
 
         let health_spec = ogs.spec.and_then(|spec| {
             spec.health.and_then(|health| {
