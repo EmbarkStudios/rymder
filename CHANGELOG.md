@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+## [0.4.0] - 2022-03-03
 ### Changed
 - [PR#5](https://github.com/EmbarkStudios/rymder/pull/14) replaced `chrono` with `time` due to `chrono` being unmaintained.
 
@@ -38,7 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First pass implementation for [Agones 1.16.0](https://agones.dev/site/blog/2021/07/20/1.16.0-kubernetes-1.19-golang-1.15/).
 
 <!-- next-url -->
-[Unreleased]: https://github.com/EmbarkStudios/rymder/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/EmbarkStudios/rymder/compare/0.4.0...HEAD
+[0.4.0]: https://github.com/EmbarkStudios/rymder/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/EmbarkStudios/rymder/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/EmbarkStudios/rymder/compare/0.2.1...0.2.2
 [0.2.1]: https://github.com/EmbarkStudios/rymder/compare/0.2.0...0.2.1
