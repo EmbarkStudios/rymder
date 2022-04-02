@@ -70,7 +70,7 @@ impl std::str::FromStr for State {
 }
 
 /// A port exposed by the container
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Port {
     /// The name of the port
     pub name: String,
@@ -80,7 +80,7 @@ pub struct Port {
 
 /// A more strongly-typed wrapper around
 /// [`Status`](crate::proto::api::game_server::Status)
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Status {
     /// The current state of the `GameServer`, see [Lifecycle Management](
     /// https://agones.dev/site/docs/guides/client-sdks/#lifecycle-management)
@@ -98,7 +98,7 @@ pub struct Status {
 /// Representation of the k8s
 /// [`ObjectMeta`](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#objectmeta-v1-meta)
 /// resource
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ObjectMeta {
     /// The name of the pod in k8s
     pub name: String,
@@ -127,7 +127,7 @@ pub struct ObjectMeta {
 
 /// More strongly-typed wrapper around
 /// [`Health`](crate::proto::api::game_server::spec::Health)
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct HealthSpec {
     /// Interval at which health checks must be sent for the gameserver to be
     /// considered healthy
@@ -141,7 +141,7 @@ pub struct HealthSpec {
 
 /// A strongly typed wrapper around the generated
 /// [`GameServer`](crate::proto::api::GameServer).
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct GameServer {
     /// k8s object metadata
     pub object_meta: Option<ObjectMeta>,
