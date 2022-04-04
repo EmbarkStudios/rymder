@@ -93,6 +93,4 @@ fn main() {
             ],
         )
         .expect("failed to compile protobuffers");
-
-    tonic_build::fmt(generated.to_str().unwrap());
 }
