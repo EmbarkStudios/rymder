@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+## Changed
+- [PR#16](https://github.com/EmbarkStudios/rymder/pull/16) updated to agones 1.21.0.
+- [PR#16](https://github.com/EmbarkStudios/rymder/pull/16) updated to tonic from 0.6 to 0.7
+
+## Added
+- [PR#15](https://github.com/EmbarkStudios/rymder/pull/15) added `Clone` impls to various public structs. Thanks [@mvlabat](https://github.com/mvlabat)!
+
 ## [0.4.0] - 2022-03-03
 ### Changed
 - [PR#5](https://github.com/EmbarkStudios/rymder/pull/14) replaced `chrono` with `time` due to `chrono` being unmaintained.
