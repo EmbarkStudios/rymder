@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+## [0.5.0] - 2022-05-11
 ## Changed
 - [PR#16](https://github.com/EmbarkStudios/rymder/pull/16) updated to agones 1.21.0.
 - [PR#16](https://github.com/EmbarkStudios/rymder/pull/16) updated to tonic from 0.6 to 0.7
@@ -46,7 +47,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First pass implementation for [Agones 1.16.0](https://agones.dev/site/blog/2021/07/20/1.16.0-kubernetes-1.19-golang-1.15/).
 
 <!-- next-url -->
-[Unreleased]: https://github.com/EmbarkStudios/rymder/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/EmbarkStudios/rymder/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/EmbarkStudios/rymder/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/EmbarkStudios/rymder/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/EmbarkStudios/rymder/compare/0.2.2...0.3.0
 [0.2.2]: https://github.com/EmbarkStudios/rymder/compare/0.2.1...0.2.2
