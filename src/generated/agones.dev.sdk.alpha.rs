@@ -1,35 +1,35 @@
 /// I am Empty
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Empty {
-}
+pub struct Empty {}
 /// Store a count variable.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Count {
-    #[prost(int64, tag="1")]
+    #[prost(int64, tag = "1")]
     pub count: i64,
 }
 /// Store a boolean result
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Bool {
-    #[prost(bool, tag="1")]
+    #[prost(bool, tag = "1")]
     pub bool: bool,
 }
 /// The unique identifier for a given player.
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlayerId {
-    #[prost(string, tag="1")]
+    #[prost(string, tag = "1")]
     pub player_id: ::prost::alloc::string::String,
 }
 /// List of Player IDs
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlayerIdList {
-    #[prost(string, repeated, tag="1")]
+    #[prost(string, repeated, tag = "1")]
     pub list: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// Generated client implementations.
 pub mod sdk_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
     use tonic::codegen::*;
+    use tonic::codegen::http::Uri;
     /// SDK service to be used in the GameServer SDK to the Pod Sidecar.
     #[derive(Debug, Clone)]
     pub struct SdkClient<T> {
@@ -50,11 +50,15 @@ pub mod sdk_client {
     where
         T: tonic::client::GrpcService<tonic::body::BoxBody>,
         T::Error: Into<StdError>,
-        T::ResponseBody: Default + Body<Data = Bytes> + Send + 'static,
+        T::ResponseBody: Body<Data = Bytes> + Send + 'static,
         <T::ResponseBody as Body>::Error: Into<StdError> + Send,
     {
         pub fn new(inner: T) -> Self {
             let inner = tonic::client::Grpc::new(inner);
+            Self { inner }
+        }
+        pub fn with_origin(inner: T, origin: Uri) -> Self {
+            let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
         pub fn with_interceptor<F>(
@@ -63,6 +67,7 @@ pub mod sdk_client {
         ) -> SdkClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
+            T::ResponseBody: Default,
             T: tonic::codegen::Service<
                 http::Request<tonic::body::BoxBody>,
                 Response = http::Response<
@@ -75,19 +80,19 @@ pub mod sdk_client {
         {
             SdkClient::new(InterceptedService::new(inner, interceptor))
         }
-        /// Compress requests with `gzip`.
+        /// Compress requests with the given encoding.
         ///
         /// This requires the server to support it otherwise it might respond with an
         /// error.
         #[must_use]
-        pub fn send_gzip(mut self) -> Self {
-            self.inner = self.inner.send_gzip();
+        pub fn send_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.send_compressed(encoding);
             self
         }
-        /// Enable decompressing responses with `gzip`.
+        /// Enable decompressing responses.
         #[must_use]
-        pub fn accept_gzip(mut self) -> Self {
-            self.inner = self.inner.accept_gzip();
+        pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
+            self.inner = self.inner.accept_compressed(encoding);
             self
         }
         /// PlayerConnect increases the SDK’s stored player count by one, and appends this playerID to GameServer.Status.Players.IDs.
