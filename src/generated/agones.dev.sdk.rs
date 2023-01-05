@@ -1,7 +1,9 @@
 /// I am Empty
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Empty {}
 /// Key, Value entry
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct KeyValue {
     #[prost(string, tag = "1")]
@@ -10,6 +12,7 @@ pub struct KeyValue {
     pub value: ::prost::alloc::string::String,
 }
 /// time duration, in seconds
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Duration {
     #[prost(int64, tag = "1")]
@@ -18,6 +21,7 @@ pub struct Duration {
 /// A GameServer Custom Resource Definition object
 /// We will only export those resources that make the most
 /// sense. Can always expand to more as needed.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GameServer {
     #[prost(message, optional, tag = "1")]
@@ -30,6 +34,7 @@ pub struct GameServer {
 /// Nested message and enum types in `GameServer`.
 pub mod game_server {
     /// representation of the K8s ObjectMeta resource
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct ObjectMeta {
         #[prost(string, tag = "1")]
@@ -59,6 +64,7 @@ pub mod game_server {
             ::prost::alloc::string::String,
         >,
     }
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Spec {
         #[prost(message, optional, tag = "1")]
@@ -66,6 +72,7 @@ pub mod game_server {
     }
     /// Nested message and enum types in `Spec`.
     pub mod spec {
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct Health {
             #[prost(bool, tag = "1")]
@@ -78,6 +85,7 @@ pub mod game_server {
             pub initial_delay_seconds: i32,
         }
     }
+    #[allow(clippy::derive_partial_eq_without_eq)]
     #[derive(Clone, PartialEq, ::prost::Message)]
     pub struct Status {
         #[prost(string, tag = "1")]
@@ -93,6 +101,7 @@ pub mod game_server {
     }
     /// Nested message and enum types in `Status`.
     pub mod status {
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct Port {
             #[prost(string, tag = "1")]
@@ -102,6 +111,7 @@ pub mod game_server {
         }
         /// \[Stage:Alpha\]
         /// \[FeatureFlag:PlayerTracking\]
+        #[allow(clippy::derive_partial_eq_without_eq)]
         #[derive(Clone, PartialEq, ::prost::Message)]
         pub struct PlayerStatus {
             #[prost(int64, tag = "1")]

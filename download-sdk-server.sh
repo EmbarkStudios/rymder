@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-if [ -z "$1" ] 
-  then
-    echo "Platform not supplied, expected either of linux, darwin or windows"
+if [ -z "$1" ]; then
+    echo "Platform not supplied, expected either of 'linux', 'darwin', or 'windows'"
     exit 1
 fi
 
 which=$1
-agones_version="1.19.0"
+agones_version="1.28.0"
 
 # unzip doesn't support stdin streams so we need to use a temp file
 server_zip=$(mktemp)

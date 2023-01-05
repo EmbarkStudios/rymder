@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+## Changed
+- [PR#17](https://github.com/EmbarkStudios/rymder/pull/17) updated tonic from 0.7 -> 0.8
+- [PR#18](https://github.com/EmbarkStudios/rymder/pull/18) updated to agones 1.28.0
+
 ## [0.5.0] - 2022-05-11
 ## Changed
 - [PR#16](https://github.com/EmbarkStudios/rymder/pull/16) updated to agones 1.21.0.
