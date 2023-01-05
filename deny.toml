@@ -13,10 +13,7 @@ ignore = []
 [bans]
 multiple-versions = "deny"
 deny = [{ name = "openssl-sys" }]
-skip = [
-    # tonice pulls in 2 versions of this
-    { name = "tokio-util", version = "=0.6.9" },
-]
+skip = []
 
 [sources]
 unknown-registry = "deny"
@@ -30,3 +27,6 @@ copyleft = "deny"
 # We want really high confidence when inferring licenses from text
 confidence-threshold = 0.93
 allow = ["Apache-2.0", "MIT"]
+exceptions = [
+    { allow = ["Unicode-DFS-2016"], name = "unicode-ident" },
+]
