@@ -1,25 +1,30 @@
 /// I am Empty
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Empty {}
 /// Store a count variable.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Count {
     #[prost(int64, tag = "1")]
     pub count: i64,
 }
 /// Store a boolean result
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Bool {
     #[prost(bool, tag = "1")]
     pub bool: bool,
 }
 /// The unique identifier for a given player.
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlayerId {
     #[prost(string, tag = "1")]
     pub player_id: ::prost::alloc::string::String,
 }
 /// List of Player IDs
+#[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct PlayerIdList {
     #[prost(string, repeated, tag = "1")]

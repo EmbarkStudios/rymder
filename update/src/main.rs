@@ -69,6 +69,21 @@ fn main() {
         std::io::copy(&mut proto, &mut tar_file).expect("failed to copy proto to file");
     }
 
+    // We also need to get the protobuf...protobuf since it's an import, but
+    // isn't included in the agones protobufs. ARGH
+    // Note we just pull the latest bleeding edge here, I guess this will be
+    // fine until it isn't, but shouldn't be an issue since google is great at
+    // backwards compat :troll:
+    let descriptor_proto = reqwest::blocking::get("https://raw.githubusercontent.com/protocolbuffers/protobuf/main/src/google/protobuf/descriptor.proto")
+        .expect("failed to send descriptor request")
+        .bytes()
+        .expect("failed to receive descriptor.proto");
+
+    let descriptor_path = extract_dir.join("googleapis/google/protobuf/descriptor.proto");
+    std::fs::create_dir_all(descriptor_path.parent().unwrap())
+        .expect("failed to create googleapis/google/protobuf");
+    std::fs::write(descriptor_path, descriptor_proto).expect("failed to write descriptor.proto");
+
     let generated = extract_dir.parent().unwrap().join("generated");
 
     if generated.exists() {
