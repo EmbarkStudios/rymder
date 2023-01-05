@@ -14,36 +14,28 @@ name: CI
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
+          components: "clippy, rustfmt"
 
       # make sure all code has been formatted with rustfmt
-      - name: check rustfmt
-        run: |
-          rustup component add rustfmt
-          cargo fmt -- --check --color always
+      - name: rustfmt
+        run: cargo fmt -- --check --color always
 
       # run clippy to verify we have no warnings
       - run: cargo fetch
-      - name: cargo clippy
-        run: |
-          rustup component add clippy
-          cargo clippy --all-targets --all-features -- -D warnings
+      - name: clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
 
   test:
     name: Test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
       - name: Download agones SDK server
         run: ./download-sdk-server.sh linux
       - run: cargo fetch
@@ -56,18 +48,15 @@ jobs:
     name: cargo-deny
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: EmbarkStudios/cargo-deny-action@v1
 
   publish-check:
     name: Publish Check
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
       - run: cargo fetch
       - name: cargo publish check
         run: cargo publish --dry-run
