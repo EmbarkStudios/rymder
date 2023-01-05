@@ -58,11 +58,10 @@ impl Sdk {
         .parse()?;
 
         let builder = tonic::transport::channel::Channel::builder(addr)
-            .keep_alive_timeout(keep_alive.unwrap_or_else(|| Duration::from_secs(30)));
+            .keep_alive_timeout(keep_alive.unwrap_or(Duration::from_secs(30)));
 
-        let (client, game_server, _channel) = tokio::time::timeout(
-            connect_timeout.unwrap_or_else(|| Duration::from_secs(30)),
-            async {
+        let (client, game_server, _channel) =
+            tokio::time::timeout(connect_timeout.unwrap_or(Duration::from_secs(30)), async {
                 let mut connect_interval = tokio::time::interval(Duration::from_millis(1));
 
                 let channel = loop {
@@ -87,11 +86,9 @@ impl Sdk {
                     connect_interval.tick().await;
                 };
 
-                Ok((client, game_server, channel))
-            },
-        )
-        .await?
-        .map_err(|e: crate::Error| e)?;
+                Result::Ok((client, game_server, channel))
+            })
+            .await??;
 
         #[cfg(feature = "player-tracking")]
         let alpha = AlphaClient::new(_channel);
