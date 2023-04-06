@@ -33,23 +33,12 @@ pub struct PlayerIdList {
 /// Generated client implementations.
 pub mod sdk_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::*;
     use tonic::codegen::http::Uri;
+    use tonic::codegen::*;
     /// SDK service to be used in the GameServer SDK to the Pod Sidecar.
     #[derive(Debug, Clone)]
     pub struct SdkClient<T> {
         inner: tonic::client::Grpc<T>,
-    }
-    impl SdkClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
     }
     impl<T> SdkClient<T>
     where
@@ -66,10 +55,7 @@ pub mod sdk_client {
             let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> SdkClient<InterceptedService<T, F>>
+        pub fn with_interceptor<F>(inner: T, interceptor: F) -> SdkClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -79,9 +65,8 @@ pub mod sdk_client {
                     <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
             >,
-            <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
+                Into<StdError> + Send + Sync,
         {
             SdkClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -98,6 +83,22 @@ pub mod sdk_client {
         #[must_use]
         pub fn accept_compressed(mut self, encoding: CompressionEncoding) -> Self {
             self.inner = self.inner.accept_compressed(encoding);
+            self
+        }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
             self
         }
         /// PlayerConnect increases the SDK’s stored player count by one, and appends this playerID to GameServer.Status.Players.IDs.
@@ -119,21 +120,20 @@ pub mod sdk_client {
         pub async fn player_connect(
             &mut self,
             request: impl tonic::IntoRequest<super::PlayerId>,
-        ) -> Result<tonic::Response<super::Bool>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Bool>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.alpha.SDK/PlayerConnect",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path =
+                http::uri::PathAndQuery::from_static("/agones.dev.sdk.alpha.SDK/PlayerConnect");
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.alpha.SDK", "PlayerConnect"));
+            self.inner.unary(req, path, codec).await
         }
         /// Decreases the SDK’s stored player count by one, and removes the playerID from GameServer.Status.Players.IDs.
         ///
@@ -151,41 +151,43 @@ pub mod sdk_client {
         pub async fn player_disconnect(
             &mut self,
             request: impl tonic::IntoRequest<super::PlayerId>,
-        ) -> Result<tonic::Response<super::Bool>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Bool>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.alpha.SDK/PlayerDisconnect",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path =
+                http::uri::PathAndQuery::from_static("/agones.dev.sdk.alpha.SDK/PlayerDisconnect");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new(
+                "agones.dev.sdk.alpha.SDK",
+                "PlayerDisconnect",
+            ));
+            self.inner.unary(req, path, codec).await
         }
         /// Update the GameServer.Status.Players.Capacity value with a new capacity.
         pub async fn set_player_capacity(
             &mut self,
             request: impl tonic::IntoRequest<super::Count>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.alpha.SDK/SetPlayerCapacity",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path =
+                http::uri::PathAndQuery::from_static("/agones.dev.sdk.alpha.SDK/SetPlayerCapacity");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new(
+                "agones.dev.sdk.alpha.SDK",
+                "SetPlayerCapacity",
+            ));
+            self.inner.unary(req, path, codec).await
         }
         /// Retrieves the current player capacity. This is always accurate from what has been set through this SDK,
         /// even if the value has yet to be updated on the GameServer status resource.
@@ -194,21 +196,22 @@ pub mod sdk_client {
         pub async fn get_player_capacity(
             &mut self,
             request: impl tonic::IntoRequest<super::Empty>,
-        ) -> Result<tonic::Response<super::Count>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Count>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.alpha.SDK/GetPlayerCapacity",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path =
+                http::uri::PathAndQuery::from_static("/agones.dev.sdk.alpha.SDK/GetPlayerCapacity");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new(
+                "agones.dev.sdk.alpha.SDK",
+                "GetPlayerCapacity",
+            ));
+            self.inner.unary(req, path, codec).await
         }
         /// Retrieves the current player count. This is always accurate from what has been set through this SDK,
         /// even if the value has yet to be updated on the GameServer status resource.
@@ -217,21 +220,22 @@ pub mod sdk_client {
         pub async fn get_player_count(
             &mut self,
             request: impl tonic::IntoRequest<super::Empty>,
-        ) -> Result<tonic::Response<super::Count>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Count>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.alpha.SDK/GetPlayerCount",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path =
+                http::uri::PathAndQuery::from_static("/agones.dev.sdk.alpha.SDK/GetPlayerCount");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new(
+                "agones.dev.sdk.alpha.SDK",
+                "GetPlayerCount",
+            ));
+            self.inner.unary(req, path, codec).await
         }
         /// Returns if the playerID is currently connected to the GameServer. This is always accurate from what has been set through this SDK,
         /// even if the value has yet to be updated on the GameServer status resource.
@@ -240,21 +244,22 @@ pub mod sdk_client {
         pub async fn is_player_connected(
             &mut self,
             request: impl tonic::IntoRequest<super::PlayerId>,
-        ) -> Result<tonic::Response<super::Bool>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Bool>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.alpha.SDK/IsPlayerConnected",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path =
+                http::uri::PathAndQuery::from_static("/agones.dev.sdk.alpha.SDK/IsPlayerConnected");
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new(
+                "agones.dev.sdk.alpha.SDK",
+                "IsPlayerConnected",
+            ));
+            self.inner.unary(req, path, codec).await
         }
         /// Returns the list of the currently connected player ids. This is always accurate from what has been set through this SDK,
         /// even if the value has yet to be updated on the GameServer status resource.
@@ -263,21 +268,23 @@ pub mod sdk_client {
         pub async fn get_connected_players(
             &mut self,
             request: impl tonic::IntoRequest<super::Empty>,
-        ) -> Result<tonic::Response<super::PlayerIdList>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::PlayerIdList>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static(
                 "/agones.dev.sdk.alpha.SDK/GetConnectedPlayers",
             );
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut().insert(GrpcMethod::new(
+                "agones.dev.sdk.alpha.SDK",
+                "GetConnectedPlayers",
+            ));
+            self.inner.unary(req, path, codec).await
         }
     }
 }
