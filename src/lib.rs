@@ -79,6 +79,7 @@
 // END - Embark standard lints v6 for Rust 1.55+
 
 pub mod errors;
+pub(crate) mod generated;
 #[allow(clippy::all, clippy::doc_markdown)]
 pub mod proto;
 mod sdk;

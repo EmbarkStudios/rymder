@@ -1,3 +1,5 @@
+pub mod alpha;
+
 /// I am Empty
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -126,23 +128,12 @@ pub mod game_server {
 /// Generated client implementations.
 pub mod sdk_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
-    use tonic::codegen::*;
     use tonic::codegen::http::Uri;
+    use tonic::codegen::*;
     /// SDK service to be used in the GameServer SDK to the Pod Sidecar
     #[derive(Debug, Clone)]
     pub struct SdkClient<T> {
         inner: tonic::client::Grpc<T>,
-    }
-    impl SdkClient<tonic::transport::Channel> {
-        /// Attempt to create a new client by connecting to a given endpoint.
-        pub async fn connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-        where
-            D: std::convert::TryInto<tonic::transport::Endpoint>,
-            D::Error: Into<StdError>,
-        {
-            let conn = tonic::transport::Endpoint::new(dst)?.connect().await?;
-            Ok(Self::new(conn))
-        }
     }
     impl<T> SdkClient<T>
     where
@@ -159,10 +150,7 @@ pub mod sdk_client {
             let inner = tonic::client::Grpc::with_origin(inner, origin);
             Self { inner }
         }
-        pub fn with_interceptor<F>(
-            inner: T,
-            interceptor: F,
-        ) -> SdkClient<InterceptedService<T, F>>
+        pub fn with_interceptor<F>(inner: T, interceptor: F) -> SdkClient<InterceptedService<T, F>>
         where
             F: tonic::service::Interceptor,
             T::ResponseBody: Default,
@@ -172,9 +160,8 @@ pub mod sdk_client {
                     <T as tonic::client::GrpcService<tonic::body::BoxBody>>::ResponseBody,
                 >,
             >,
-            <T as tonic::codegen::Service<
-                http::Request<tonic::body::BoxBody>,
-            >>::Error: Into<StdError> + Send + Sync,
+            <T as tonic::codegen::Service<http::Request<tonic::body::BoxBody>>>::Error:
+                Into<StdError> + Send + Sync,
         {
             SdkClient::new(InterceptedService::new(inner, interceptor))
         }
@@ -193,188 +180,186 @@ pub mod sdk_client {
             self.inner = self.inner.accept_compressed(encoding);
             self
         }
+        /// Limits the maximum size of a decoded message.
+        ///
+        /// Default: `4MB`
+        #[must_use]
+        pub fn max_decoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_decoding_message_size(limit);
+            self
+        }
+        /// Limits the maximum size of an encoded message.
+        ///
+        /// Default: `usize::MAX`
+        #[must_use]
+        pub fn max_encoding_message_size(mut self, limit: usize) -> Self {
+            self.inner = self.inner.max_encoding_message_size(limit);
+            self
+        }
         /// Call when the GameServer is ready
         pub async fn ready(
             &mut self,
             request: impl tonic::IntoRequest<super::Empty>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
             let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/Ready");
-            self.inner.unary(request.into_request(), path, codec).await
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "Ready"));
+            self.inner.unary(req, path, codec).await
         }
         /// Call to self Allocation the GameServer
         pub async fn allocate(
             &mut self,
             request: impl tonic::IntoRequest<super::Empty>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.SDK/Allocate",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/Allocate");
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "Allocate"));
+            self.inner.unary(req, path, codec).await
         }
         /// Call when the GameServer is shutting down
         pub async fn shutdown(
             &mut self,
             request: impl tonic::IntoRequest<super::Empty>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.SDK/Shutdown",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/Shutdown");
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "Shutdown"));
+            self.inner.unary(req, path, codec).await
         }
         /// Send a Empty every d Duration to declare that this GameSever is healthy
         pub async fn health(
             &mut self,
             request: impl tonic::IntoStreamingRequest<Message = super::Empty>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.SDK/Health",
-            );
-            self.inner
-                .client_streaming(request.into_streaming_request(), path, codec)
-                .await
+            let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/Health");
+            let mut req = request.into_streaming_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "Health"));
+            self.inner.client_streaming(req, path, codec).await
         }
         /// Retrieve the current GameServer data
         pub async fn get_game_server(
             &mut self,
             request: impl tonic::IntoRequest<super::Empty>,
-        ) -> Result<tonic::Response<super::GameServer>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::GameServer>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.SDK/GetGameServer",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/GetGameServer");
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "GetGameServer"));
+            self.inner.unary(req, path, codec).await
         }
         /// Send GameServer details whenever the GameServer is updated
         pub async fn watch_game_server(
             &mut self,
             request: impl tonic::IntoRequest<super::Empty>,
-        ) -> Result<
+        ) -> std::result::Result<
             tonic::Response<tonic::codec::Streaming<super::GameServer>>,
             tonic::Status,
         > {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.SDK/WatchGameServer",
-            );
-            self.inner.server_streaming(request.into_request(), path, codec).await
+            let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/WatchGameServer");
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "WatchGameServer"));
+            self.inner.server_streaming(req, path, codec).await
         }
         /// Apply a Label to the backing GameServer metadata
         pub async fn set_label(
             &mut self,
             request: impl tonic::IntoRequest<super::KeyValue>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.SDK/SetLabel",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/SetLabel");
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "SetLabel"));
+            self.inner.unary(req, path, codec).await
         }
         /// Apply a Annotation to the backing GameServer metadata
         pub async fn set_annotation(
             &mut self,
             request: impl tonic::IntoRequest<super::KeyValue>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.SDK/SetAnnotation",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/SetAnnotation");
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "SetAnnotation"));
+            self.inner.unary(req, path, codec).await
         }
         /// Marks the GameServer as the Reserved state for Duration
         pub async fn reserve(
             &mut self,
             request: impl tonic::IntoRequest<super::Duration>,
-        ) -> Result<tonic::Response<super::Empty>, tonic::Status> {
-            self.inner
-                .ready()
-                .await
-                .map_err(|e| {
-                    tonic::Status::new(
-                        tonic::Code::Unknown,
-                        format!("Service was not ready: {}", e.into()),
-                    )
-                })?;
+        ) -> std::result::Result<tonic::Response<super::Empty>, tonic::Status> {
+            self.inner.ready().await.map_err(|e| {
+                tonic::Status::new(
+                    tonic::Code::Unknown,
+                    format!("Service was not ready: {}", e.into()),
+                )
+            })?;
             let codec = tonic::codec::ProstCodec::default();
-            let path = http::uri::PathAndQuery::from_static(
-                "/agones.dev.sdk.SDK/Reserve",
-            );
-            self.inner.unary(request.into_request(), path, codec).await
+            let path = http::uri::PathAndQuery::from_static("/agones.dev.sdk.SDK/Reserve");
+            let mut req = request.into_request();
+            req.extensions_mut()
+                .insert(GrpcMethod::new("agones.dev.sdk.SDK", "Reserve"));
+            self.inner.unary(req, path, codec).await
         }
     }
 }

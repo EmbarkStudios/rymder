@@ -1,6 +1,6 @@
 pub mod gameserver;
 
-use std::{convert::TryInto, env, time::Duration};
+use std::{env, time::Duration};
 use tonic::transport::Channel;
 
 use crate::proto::api::{self, sdk_client::SdkClient};

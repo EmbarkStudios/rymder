@@ -22,6 +22,11 @@
 
 See the [Agones Rust guide](https://agones.dev/site/docs/tutorials/simple-gameserver-rust/) for context about how to use this client, which is _mostly_ the same as the official client in the [Agones repo](https://github.com/googleforgames/agones/tree/main/sdks/rust).
 
+## Development
+
+Generate new protocol buffers with by running [proto-gen](https://github.com/EmbarkStudios/proto-gen).  
+`proto-gen --format --build-client generate -d src/proto -d src/proto/googleapis -f src/proto/sdk/sdk.proto -f src/proto/sdk/alpha/alpha.proto -o src/generated`
+
 ## Contribution
 
 [![Contributor Covenant](https://img.shields.io/badge/contributor%20covenant-v1.4-ff69b4.svg)](CODE_OF_CONDUCT.md)

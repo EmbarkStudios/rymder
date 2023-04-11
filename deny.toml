@@ -13,7 +13,10 @@ ignore = []
 [bans]
 multiple-versions = "deny"
 deny = [{ name = "openssl-sys" }]
-skip = []
+skip = [
+    # Syn 1.x -> 2.x migration taking some time to propagate
+    { name = "syn", version = "=1.0.109"},
+]
 
 [sources]
 unknown-registry = "deny"
