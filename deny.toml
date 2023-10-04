@@ -14,8 +14,8 @@ ignore = []
 multiple-versions = "deny"
 deny = [{ name = "openssl-sys" }]
 skip = [
-    # Syn 1.x -> 2.x migration taking some time to propagate
-    { name = "syn", version = "=1.0.109"},
+    # hyper uses an old version
+    { name = "socket2", version = "=0.4.9" },
 ]
 
 [sources]
@@ -29,7 +29,5 @@ allow-osi-fsf-free = "neither"
 copyleft = "deny"
 # We want really high confidence when inferring licenses from text
 confidence-threshold = 0.93
-allow = ["Apache-2.0", "MIT"]
-exceptions = [
-    { allow = ["Unicode-DFS-2016"], name = "unicode-ident" },
-]
+allow = ["Apache-2.0", "MIT", "BSD-3-Clause"]
+exceptions = [{ allow = ["Unicode-DFS-2016"], name = "unicode-ident" }]
