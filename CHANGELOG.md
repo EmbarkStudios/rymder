@@ -7,8 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- next-header -->
-
 ## [Unreleased] - ReleaseDate
+
+## [0.7.0] - 2023-10-05
 ### Changed
 - [PR#21](https://github.com/EmbarkStudios/rymder/pull/21) updated `prost` and `tonic` to 0.11 and 0.9 respectively.
 
@@ -60,7 +61,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First pass implementation for [Agones 1.16.0](https://agones.dev/site/blog/2021/07/20/1.16.0-kubernetes-1.19-golang-1.15/).
 
 <!-- next-url -->
-[Unreleased]: https://github.com/EmbarkStudios/rymder/compare/0.6.1...HEAD
+[Unreleased]: https://github.com/EmbarkStudios/rymder/compare/0.7.0...HEAD
+[0.7.0]: https://github.com/EmbarkStudios/rymder/compare/0.6.1...0.7.0
 [0.6.1]: https://github.com/EmbarkStudios/rymder/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/EmbarkStudios/rymder/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/EmbarkStudios/rymder/compare/0.4.0...0.5.0
