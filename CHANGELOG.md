@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- next-header -->
 ## [Unreleased] - ReleaseDate
+### Changed
+- [PR#22](https://github.com/EmbarkStudios/rymder/pull/22) updated `prost` and `tonic` to 0.12 and 0.10 respectively.
 
 ## [0.7.0] - 2023-10-05
 ### Changed
 - [PR#21](https://github.com/EmbarkStudios/rymder/pull/21) updated `prost` and `tonic` to 0.11 and 0.9 respectively.
 
-## [0.6.1] - 2023-10-04
+## [0.6.1] - 2023-10-04 **yanked**
 ### Changed
 - [PR#20](https://github.com/EmbarkStudios/rymder/pull/20) updated `prost` and `tonic`
 
