@@ -7,7 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 <!-- next-header -->
+
 ## [Unreleased] - ReleaseDate
+### Changed
+- [PR#21](https://github.com/EmbarkStudios/rymder/pull/21) updated `prost` and `tonic` to 0.11 and 0.9 respectively.
+
 ## [0.6.1] - 2023-10-04
 ### Changed
 - [PR#20](https://github.com/EmbarkStudios/rymder/pull/20) updated `prost` and `tonic`
